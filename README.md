@@ -83,7 +83,6 @@ Escolha uma opção:
 - Simulação de regras bancárias reais
 - Boas práticas com métodos e validações
 - Controle de estado (saldo vs. cheque especial)
-- Cálculos e restrições com `Math.min()`, condicionais e fluxos complexos
 
 ---
 
