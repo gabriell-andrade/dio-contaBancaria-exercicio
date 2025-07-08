@@ -5,7 +5,10 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int opcao = 0;
 
-        ContaBancaria conta = new ContaBancaria();
+        System.out.println("Digite o valor do depósito inicial para abrir sua conta: ");
+        double depositoInicial = sc.nextDouble();
+        ContaBancaria conta = new ContaBancaria(depositoInicial);
+        System.out.println("===========================================================");
 
         while (opcao != 7) {
             System.out.println("""
@@ -21,32 +24,43 @@ public class Main {
             opcao = sc.nextInt();
 
             switch (opcao) {
-                case 1, 2:
+                case 1:
                     System.out.println(conta.consultaSaldo());
+                    System.out.println("===========================================================");
+                    break;
+                case 2:
+                    System.out.println(conta.consultaChequeEspecial());
+                    System.out.println("===========================================================");
                     break;
                 case 3:
                     System.out.println("Qual o valor do depósito?");
                     double deposito = sc.nextDouble();
                     System.out.println(conta.depositaDinheiro(deposito));
+                    System.out.println("===========================================================");
                     break;
                 case 4:
                     System.out.println("Qual o valor do saque? ");
                     double saque = sc.nextDouble();
                     System.out.println(conta.sacaDinheiro(saque));
+                    System.out.println("===========================================================");
                     break;
                 case 5:
                     System.out.println("Qual o valor do boleto?");
                     double valorBoleto = sc.nextDouble();
-                    conta.pagaBoleto(valorBoleto);
+                    System.out.println(conta.pagaBoleto(valorBoleto));
+                    System.out.println("===========================================================");
                     break;
                 case 6:
-                    conta.usandoChequeEspecial();
+                    System.out.println(conta.usaChequeEspecial());
+                    System.out.println("===========================================================");
                     break;
                 case 7:
                     System.out.println("Encerrando o Programa! Obrigado!");
+                    System.out.println("===========================================================");
                     break;
                 default:
                     System.out.println("Opção Inválida!");
+                    System.out.println("===========================================================");
             }
         }
         sc.close();

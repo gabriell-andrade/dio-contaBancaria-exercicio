@@ -1,46 +1,42 @@
 public class ContaBancaria {
     private double saldo;
-    private double chequeEspecial;
+    private final double chequeEspecialInicial;
+    private double chequeEspecialDisponivel;
 
-    //Getters-Setters
-    public double getSaldo() {
-        return saldo;
-    }
-
-    public void setSaldo(double saldo) {
-        this.saldo = saldo;
-    }
-
-    public double getChequeEspecial() {
-        if (saldo >= 500) {
-            return saldo * 0.5;
+    public ContaBancaria(double depositoInicial) {
+        this.saldo = depositoInicial;
+        if (depositoInicial <= 500) {
+            this.chequeEspecialInicial = 50;
         } else {
-            return saldo * 0.1;
+            this.chequeEspecialInicial = depositoInicial * 0.5;
         }
-    }
-
-    //METODOS
-    public void semSaldo() {
-        System.out.println("Você não tem saldo nem limite para esta operação");
+        this.chequeEspecialDisponivel = chequeEspecialInicial;
     }
 
     public String consultaSaldo() {
-        return String.format("Saldo: R$ %.2f (Cheque Especial: R$ %.2f)", saldo, chequeEspecial);
+        taxaChequeEspecial();
+        return String.format("Saldo: R$ %.2f (Cheque Especial: R$ %.2f)", saldo, chequeEspecialDisponivel);
     }
 
-    public void consultaChequeEspecial () {
-        if (saldo >= 500) {
-            chequeEspecial = saldo * 0.5;
-        } else if (saldo < 500 && saldo >= 1){
-            chequeEspecial = saldo * 0.1;
+    public String consultaChequeEspecial() {
+        return String.format("Cheque Especial: R$ %.2f", chequeEspecialDisponivel);
+    }
+
+    public String depositaDinheiro(double deposito) {
+        //todo: tem que recuperar primeiro o cheque especial (se estiver sendo usado) e depois adicionar saldo
+        if (saldo >= 0) { //deposito normal: tem saldo positivo
+            saldo += deposito;
         } else {
-            chequeEspecial = 0;
-        }
-    }
+            if (saldo + deposito >= 0) { //recupera chq esp
+                chequeEspecialDisponivel = chequeEspecialInicial;
+                saldo += deposito;
+            } else { //não recupera total
+                // -70 0 +50  >> -20 30 0
 
-    public String depositaDinheiro (double deposito) {
-        saldo += deposito;
-        consultaChequeEspecial();
+                saldo += deposito;
+                chequeEspecialDisponivel = saldo + chequeEspecialInicial;
+            }
+        }
         return consultaSaldo();
     }
 
@@ -48,51 +44,56 @@ public class ContaBancaria {
         if (saldo > saque) {
             saldo -= saque;
             System.out.println("Saque Realizado com Sucesso!");
-            return consultaSaldo();
-        } else if (saldo + chequeEspecial >= saque) {
+        } else if (saldo + chequeEspecialDisponivel >= saque) {
             saldo -= saque;
-            chequeEspecial += saldo;
+            chequeEspecialDisponivel += saldo;
             System.out.println("Saque Realizado com Sucesso!");
-            return consultaSaldo();
-        } else if (saldo <= 0 && chequeEspecial >= saque) {
-            chequeEspecial -= saque;
+        } else if (saldo <= 0 && chequeEspecialDisponivel >= saque) {
+            chequeEspecialDisponivel -= saque;
             saldo -= saque;
             System.out.println("Saque Realizado com Sucesso!");
-            return consultaSaldo();
         } else {
-            semSaldo();
-            return consultaSaldo();
+            System.out.println("Você não tem saldo nem limite para esta operação");
         }
+        return consultaSaldo();
     }
 
-    public String pagaBoleto (double valorBoleto) {
+    public String pagaBoleto(double valorBoleto) {
         if (saldo > valorBoleto) {
             saldo -= valorBoleto;
             System.out.println("Boleto Pago!");
-            return consultaSaldo();
-        } else if (saldo + chequeEspecial >=  valorBoleto) {
+        } else if (saldo + chequeEspecialDisponivel >=  valorBoleto) {
             saldo -= valorBoleto;
-            chequeEspecial += saldo;
+            chequeEspecialDisponivel += saldo;
             System.out.println("Boleto Pago!");
-            return consultaSaldo();
-        } else if (saldo <= 0 && chequeEspecial >= valorBoleto) {
-            chequeEspecial -= valorBoleto;
+        } else if (saldo <= 0 && chequeEspecialDisponivel >= valorBoleto) {
+            chequeEspecialDisponivel -= valorBoleto;
             saldo -= valorBoleto;
             System.out.println("Saque Realizado com Sucesso!");
-            return consultaSaldo();
         } else {
-            semSaldo();
-            return consultaSaldo();
+            System.out.println("Você não tem saldo nem limite para esta operação");
         }
+        return consultaSaldo();
     }
 
-    public String usandoChequeEspecial () {
+    public String usaChequeEspecial() {
         if (saldo < 0) {
             System.out.println("Você está usando o cheque especial");
-            return consultaSaldo();
         } else {
             System.out.println("Você não está usando o cheque especial");
-            return consultaSaldo();
+        }
+        return consultaSaldo();
+    }
+
+    public void taxaChequeEspecial() {
+        if (saldo < 0) {
+            double taxa = Math.abs(saldo) * 0.2;
+            saldo -= taxa;
+            chequeEspecialDisponivel -= taxa;
+            if (chequeEspecialDisponivel < 0) {
+                chequeEspecialDisponivel = 0;
+            }
+            System.out.printf("Foi cobrada uma taxa de R$ %.2f por estar usando o Cheque Especial\n", taxa);
         }
     }
 }
